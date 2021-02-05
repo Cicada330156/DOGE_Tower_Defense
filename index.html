@@ -1,5 +1,35 @@
 <doctype html>
 <head>
+    	<title>Doge castle defense</title> 
+	<style>
+		body{
+			margin: 0;
+		}
+		canvas{
+			display: block;
+			background: black;
+			margin-left: auto;
+			margin-right: auto;
+		}
+	</style>
 </head>
 <body>
+	<canvas id="gamePanel"></canvas>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.1.3/pixi.min.js"></script>
+	<script type="text/javascript">
+		const canvas = document.getElementById('gamePanel');
+		const app = new PIXI.Application({
+			view: canvas,
+			width: window.innerWidth * 0.9,
+			height: window.innerHeight * 0.9
+		});
+
+		app.ticker.add(animate);
+
+		const thiefCate = PIXI.Texture.from('https://cdn.discordapp.com/emojis/569160672739590174.png?v=1');
+		const cate = new 
+		function animate() {
+			
+		}
+	</script>
 </body>
