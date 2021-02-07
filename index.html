@@ -7,7 +7,6 @@
 		}
 		canvas{
 			display: block;
-			background: black;
 			margin-left: auto;
 			margin-right: auto;
 		}
@@ -21,15 +20,41 @@
 		const app = new PIXI.Application({
 			view: canvas,
 			width: window.innerWidth * 0.9,
-			height: window.innerHeight * 0.9
+			height: window.innerHeight * 0.9,
+			backgroundColor: 0x7cfc00
 		});
+
+		const thiefCate = PIXI.Texture.from('https://cdn.discordapp.com/emojis/569160672739590174.png?v=1');
+		let cates = [];
+		for (i = 0; while i < 3; i++) {
+			const cate = new PIXI.Sprite(thiefCate); 
+			cate.currentSegment = 0;
+			cates.push(cate);
+		}
+		app.stage.addChild(cate);
+
+		const catePath = [[100, 100], [200, 200], [300, 200]]
+		console.log(catePath);
+		console.log(cate);
 
 		app.ticker.add(animate);
 
-		const thiefCate = PIXI.Texture.from('https://cdn.discordapp.com/emojis/569160672739590174.png?v=1');
-		const cate = new PIXI.Sprite(thiefCate); 
+		function followPath (p1, p2, index) {
+			if (p1 == p2) {
+				cates[index].currentSegment++;
+				return;
+			}
+		}
+
+		catePos = 0;
+		frame = 0;
 		function animate() {
-			
+			if (frame % 30 == 0) {
+				catePos++;
+			};
+			cate.position.x = catePath[catePos % catePath.length][0]
+			cate.position.y = catePath[catePos % catePath.length][1]
+			frame++;
 		}
 	</script>
 </body>
