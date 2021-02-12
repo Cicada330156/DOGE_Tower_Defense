@@ -24,18 +24,30 @@
 			backgroundColor: 0x7cfc00
 		});
 
+		/*let cateSpawner = new PIXI.Ticker;
+		cateSpawner.minFPS = 0;
+		cateSpawner.maxFPS = 0.5;
+		cateSpawner.add(spawn);
+		cateSpawner.start();*/
+		function spawn(){
+			console.log("cate!");
+			//for (i = 0; i < 1; i++) {
+				const cate = new PIXI.Sprite(thiefCate); 
+				cate.currentSegment = 0;
+				cates.push(cate);
+				app.stage.addChild(cate);
+			//}
+		}
+		var cateInterval = 2000;
+		var lastCate = 0;
+		console.log(lastCate);
+
 		const thiefCate = PIXI.Texture.from('https://cdn.discordapp.com/emojis/569160672739590174.png?v=1');
 		let cates = [];
-		for (i = 0; while i < 3; i++) {
-			const cate = new PIXI.Sprite(thiefCate); 
-			cate.currentSegment = 0;
-			cates.push(cate);
-		}
-		app.stage.addChild(cate);
+		cateSpeed = 1;
 
 		const catePath = [[100, 100], [200, 200], [300, 200]]
 		console.log(catePath);
-		console.log(cate);
 
 		app.ticker.add(animate);
 
@@ -46,15 +58,28 @@
 			}
 		}
 
+		spawn();
+
 		catePos = 0;
 		frame = 0;
+		lastFrame = (Date.now());
 		function animate() {
 			if (frame % 30 == 0) {
 				catePos++;
 			};
-			cate.position.x = catePath[catePos % catePath.length][0]
-			cate.position.y = catePath[catePos % catePath.length][1]
+			if (Date.now() - cateInterval >= lastCate) {
+				lastCate = Date.now();
+				console.log(Date.now());
+				spawn();
+			}
+			//cates[0].position.x = catePath[catePos % catePath.length][0]
+			//cates[0].position.y = catePath[catePos % catePath.length][1]
+			for (var i = 0; i < cates.length; i++) {
+				cates[i].x += ((Date.now()-lastFrame)/1000*60/cateSpeed);
+			}
+
 			frame++;
+			lastFrame = Date.now();
 		}
 	</script>
 </body>
