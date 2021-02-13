@@ -32,7 +32,7 @@
 		}
 		waveType = defaultWave;
 		let cates = [];
-		function spawn(type) {
+		function cateSpawn(type) {
 			for (i = 0; i < 1; i++) {
 				let cate = new PIXI.Sprite(thiefCate); 
 				cate.currentSegment = 0;
@@ -44,15 +44,27 @@
 		}
 		
 		const closeDefDoge = PIXI.Texture.from('https://cdn.discordapp.com/emojis/688470220867764228.png?v=1');
-		closeDefStats = {
+		dogeCloseDef = {
 		range: 20,
 		attack: 5
-		}
-		typeInfo = closeDefStats;
+		};
+		//dogeType = dogeCloseDef;
 		let doges = [];
-		let doge = new PIXI.Sprite(closeDefDoge);
-		doge.range = typeInfo.range;
-		doge.attack = typeInfo.attack;
+		function dogeSpawn (dogeType) {
+			let doge = new PIXI.Sprite(closeDefDoge);
+			doge.range = dogeType.range;
+			doge.attack = dogeType.attack;
+			app.stage.addChild(doge);
+			doges.push(doge);
+		}
+		dogeSpawn(dogeCloseDef);
+
+		function getDistance(p1, p2) {
+			xL = p1.x - p2.x;
+			yL = p1.y - p2.y;
+			d = Math.sqrt((xL * xL) + (yL * yL));
+			return(d);
+		}
 
 		const defaultBaseHP = 20;
 		baseHP = defaultBaseHP;
@@ -109,11 +121,28 @@
 		app.ticker.add(animate);
 		function animate() {
 			if (frame % waveType.cateSpawnRate == 0) {
-				spawn();
+				cateSpawn();
 			}
 			for (var i = 0; i < cates.length; i++) {
 				cates[i].x += waveType.cateSpeed;
 			}
+			if (frame % 30 == 0) {
+				for (var i = 0; i < doges.length; i++) {
+					for (var g = 0; g < cates.length; g++) {
+						spriteDistance = getDistance(cates[g].position, doges[i].position)
+						if (spriteDistance <= doges[i].range) {
+							console.log("bonk!");
+							cates[g].HP -= doges[i].attack;
+						}
+						if (cates[g].HP <= 0) {
+							app.stage.removeChild(cates[i]);
+							cates.splice(i, 1);
+						}
+					}
+				}
+			}
+
+			//everything after this has to be done last, for order of operations and such. otherwise it gets super buggy.
 			for (var i = 0; i < cates.length - 1; i++) {
 				if (cates[i].x >= app.renderer.width/2) {
 					hurtBase(cates[i]);
