@@ -25,45 +25,100 @@
 			autostart: false
 		});
 
-		const catePath = [[100, 100], [200, 200], [300, 200]];
-		//console.log(catePath);
-
 		const thiefCate = PIXI.Texture.from('https://cdn.discordapp.com/emojis/569160672739590174.png?v=1');
+		defaultWave = {
+		cateSpeed: 1,
+		cateSpawnRate: 120
+		}
+		waveType = defaultWave;
 		let cates = [];
-		function spawn() {
+		function spawn(type) {
 			for (i = 0; i < 1; i++) {
 				let cate = new PIXI.Sprite(thiefCate); 
 				cate.currentSegment = 0;
+				cate.attack = 5;
+				cate.HP = 10;
 				app.stage.addChild(cate);
 				cates.push(cate);
 			}
 		}
+		
+		const closeDefDoge = PIXI.Texture.from('https://cdn.discordapp.com/emojis/688470220867764228.png?v=1');
+		closeDefStats = {
+		range: 20,
+		attack: 5
+		}
+		typeInfo = closeDefStats;
+		let doges = [];
+		let doge = new PIXI.Sprite(closeDefDoge);
+		doge.range = typeInfo.range;
+		doge.attack = typeInfo.attack;
 
-		function followPath (p1, p2, index) {
-			if (p1 == p2) {
-				cates[index].currentSegment++;
-				return;
+		const defaultBaseHP = 20;
+		baseHP = defaultBaseHP;
+		function hurtBase(attacker) {
+			baseHP -= attacker.attack;
+			console.log("oh no! an enemy got in! \n your base's hp is now " + baseHP);
+			if (baseHP <= 0) {
+				app.ticker.stop();
+				alert("oh noes! looks like your base was defeated by the cates!");
 			}
 		}
-		
-		catePos = 0;
+
+		const catePath = [[100, 100], [200, 200], [300, 200]];
+		function followPath (p1, p2, attackerId, dt) {
+			var right;
+			var left;
+			if (p1 == p2) {
+				attackerId.currentSegment++;
+				return;
+			} else if (p1[0] == p2[0]) {
+				//horizontal
+				if (p1[0] > p2[0]) {
+					right = false;
+					attackerId.x += cateSpeed;
+				} else {
+					right = true;
+					attackerId.x -= cateSpeed;
+				}
+			} else if (p1[1] == p2[1]) {
+				//vertical
+				if (p1[1] > p2[1]) {
+					up = false;
+					attackerId.x += cateSpeed;
+				} else {
+					up = true;
+					attackerId.x -= cateSpeed;
+				}
+			} else {
+				//diagonal
+				if (p1[0] > p2[0]) {
+					right = false;
+				} else {
+					right = true;
+				}
+				if (p1[1] > p2[1]) {
+					up = false;
+				} else {
+					up = true;
+				}
+			}
+		}	
+
 		frame = 0;
 		app.ticker.add(animate);
 		function animate() {
-			console.log(cates);
-			if (frame % 120 == 0) {
+			if (frame % waveType.cateSpawnRate == 0) {
 				spawn();
 			}
 			for (var i = 0; i < cates.length; i++) {
-				cates[i].x++;
+				cates[i].x += waveType.cateSpeed;
 			}
 			for (var i = 0; i < cates.length - 1; i++) {
 				if (cates[i].x >= app.renderer.width/2) {
-					//console.log("sprite destroyed: " + cates + " within cates[]");
-					console.log(cates);
+					hurtBase(cates[i]);
 					app.stage.removeChild(cates[i]);
 					cates.splice(i, 1);
-					//cates[i].destroy(true);
 				}
 			}
 			frame++;
