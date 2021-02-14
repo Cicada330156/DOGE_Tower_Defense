@@ -30,34 +30,55 @@
 		cateSpeed: 1,
 		cateSpawnRate: 120
 		}
+		cateTypes = [
+			{size: [113, 100], attack: 5, HP: 10},//normal cate
+			{size: [113, 100]}
+		]
 		waveType = defaultWave;
 		let cates = [];
-		function cateSpawn(type) {
+		function cateSpawn(type, pos) {
 			for (i = 0; i < 1; i++) {
 				let cate = new PIXI.Sprite(thiefCate); 
+				cate.anchor.set(0.5);
 				cate.currentSegment = 0;
-				cate.attack = 5;
-				cate.HP = 10;
+				//variables base on inputs
+				cate.x = pos[0];
+				cate.y = pos[1];
+				//type defined traits vv
+				cate.attack = cateTypes[type].attack;
+				cate.HP = cateTypes[type].HP;
+				cate.width = cateTypes[type].size[0];
+				cate.height = cateTypes[type].size[1];
+				//add to stage and array
 				app.stage.addChild(cate);
 				cates.push(cate);
 			}
 		}
 		
 		const closeDefDoge = PIXI.Texture.from('https://cdn.discordapp.com/emojis/688470220867764228.png?v=1');
-		dogeCloseDef = {
-		range: 20,
-		attack: 5
-		};
+		dogeTypes = [
+		{range: 50, attack: 5}, //close defense baguette doge
+		{range: 200, attach: 3} //ranged attack doge
+		];
 		//dogeType = dogeCloseDef;
 		let doges = [];
-		function dogeSpawn (dogeType) {
-			let doge = new PIXI.Sprite(closeDefDoge);
-			doge.range = dogeType.range;
-			doge.attack = dogeType.attack;
-			app.stage.addChild(doge);
-			doges.push(doge);
+		function dogeSpawn (type, pos) {
+			for (i = 0; i < 1; i++) {
+				let doge = new PIXI.Sprite(closeDefDoge);
+				doge.range = dogeTypes[type].range;
+				doge.attack = dogeTypes[type].attack;
+				doge.anchor.set(0.5);
+				doge.height = 100;
+				doge.width = 100;
+				doge.x = pos[0];
+				doge.y = pos[1];
+				app.stage.addChild(doge);
+				doges.push(doge);
+			}
 		}
-		dogeSpawn(dogeCloseDef);
+		dogeSpawn(0, [50, 35]);
+		dogeSpawn(0, [50, 200]);
+		dogeSpawn(0, [400, 225]);
 
 		function getDistance(p1, p2) {
 			xL = p1.x - p2.x;
@@ -70,7 +91,6 @@
 		baseHP = defaultBaseHP;
 		function hurtBase(attacker) {
 			baseHP -= attacker.attack;
-			console.log("oh no! an enemy got in! \n your base's hp is now " + baseHP);
 			if (baseHP <= 0) {
 				app.ticker.stop();
 				alert("oh noes! looks like your base was defeated by the cates!");
@@ -121,7 +141,11 @@
 		app.ticker.add(animate);
 		function animate() {
 			if (frame % waveType.cateSpawnRate == 0) {
-				cateSpawn();
+				if((frame / waveType.cateSpawnRate) % 2 == 0){
+				cateSpawn(0, [50, 75]);
+				}else{
+				cateSpawn(0, [50, 250]);
+				}
 			}
 			for (var i = 0; i < cates.length; i++) {
 				cates[i].x += waveType.cateSpeed;
@@ -135,8 +159,8 @@
 							cates[g].HP -= doges[i].attack;
 						}
 						if (cates[g].HP <= 0) {
-							app.stage.removeChild(cates[i]);
-							cates.splice(i, 1);
+							app.stage.removeChild(cates[g]);
+							cates.splice(g, 1);
 						}
 					}
 				}
@@ -144,10 +168,12 @@
 
 			//everything after this has to be done last, for order of operations and such. otherwise it gets super buggy.
 			for (var i = 0; i < cates.length - 1; i++) {
-				if (cates[i].x >= app.renderer.width/2) {
+				if (cates[i].x >= app.renderer.width) {
 					hurtBase(cates[i]);
+					console.log("a cate got in! \nbase HP is now " + baseHP)
 					app.stage.removeChild(cates[i]);
 					cates.splice(i, 1);
+					i--;
 				}
 			}
 			frame++;
