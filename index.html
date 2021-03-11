@@ -97,50 +97,37 @@
 			}
 		}
 
-		const catePath = [[100, 100], [200, 200], [300, 200]];
-		function followPath (p1, p2, attackerId, dt) {
-			var right;
-			var left;
-			if (p1 == p2) {
-				attackerId.currentSegment++;
-				return;
-			} else if (p1[0] == p2[0]) {
-				//horizontal
-				if (p1[0] > p2[0]) {
-					right = false;
-					attackerId.x += cateSpeed;
-				} else {
-					right = true;
-					attackerId.x -= cateSpeed;
-				}
-			} else if (p1[1] == p2[1]) {
-				//vertical
-				if (p1[1] > p2[1]) {
-					up = false;
-					attackerId.x += cateSpeed;
-				} else {
-					up = true;
-					attackerId.x -= cateSpeed;
-				}
-			} else {
-				//diagonal
-				if (p1[0] > p2[0]) {
-					right = false;
-				} else {
-					right = true;
-				}
-				if (p1[1] > p2[1]) {
-					up = false;
-				} else {
-					up = true;
-				}
-			}
-		}	
 		
-		const buttonTexture = PIXI.Texture.from("");
+		const buttonTexture = PIXI.Texture.from("https://cicada330156.github.io/DOGE_bloons/openMenuButton.png");
+		console.log(buttonTexture);
+		let menuOpenButton = new PIXI.Sprite(buttonTexture);
+		//menuOpenButton.anchor = [1, 0];
+		menuOpenButton.scale = (0.5, 0.5);
+		menuOpenButton.x = 200;
+		menuOpenButton.y = 200;
+		console.log(menuOpenButton.position);
+		app.stage.addChild(menuOpenButton);
 		function openMenu () {
 			
 		}
+
+		function checkVertical (p1, p2) {
+			if (p1 != p2) {
+				if (p1[0] != p2[0])
+					if (p1[1] != p2[1])
+						return(diagonal);
+					}
+					return(horizontal);
+				}
+				return(vertical);
+			}
+			return(no_movement);
+		}
+
+		const catePath = [[100, 100], [200, 200], [300, 200]];
+		function followPath (attackerId) {
+			
+		}	
 
 		frame = 0;
 		app.ticker.add(animate);
@@ -153,7 +140,8 @@
 				}
 			}
 			for (var i = 0; i < cates.length; i++) {
-				cates[i].x += waveType.cateSpeed;
+				//cates[i].x += waveType.cateSpeed;
+
 			}
 			if (frame % 30 == 0) {
 				for (var i = 0; i < doges.length; i++) {
