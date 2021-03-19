@@ -49,6 +49,7 @@
 				cate.HP = cateTypes[type].HP;
 				cate.width = cateTypes[type].size[0];
 				cate.height = cateTypes[type].size[1];
+				cate.stage = defaultWave;
 				//add to stage and array
 				app.stage.addChild(cate);
 				cates.push(cate);
@@ -76,14 +77,17 @@
 				doges.push(doge);
 			}
 		}
-		dogeSpawn(0, [50, 35]);
+		//dogeSpawn(0, [50, 35]);
 		dogeSpawn(0, [50, 200]);
 		dogeSpawn(0, [400, 225]);
 
-		function getDistance(p1, p2) {
+		function getDistance(p1, p2, absolute) {
 			xL = p1.x - p2.x;
 			yL = p1.y - p2.y;
 			d = Math.sqrt((xL * xL) + (yL * yL));
+			if (absolute) {
+				return (Math.abs(d));
+			}
 			return(d);
 		}
 
@@ -113,8 +117,8 @@
 
 		function checkVertical (p1, p2) {
 			if (p1 != p2) {
-				if (p1[0] != p2[0])
-					if (p1[1] != p2[1])
+				if (p1[0] != p2[0]) {
+					if (p1[1] != p2[1]) {
 						return(diagonal);
 					}
 					return(horizontal);
@@ -126,22 +130,28 @@
 
 		const catePath = [[100, 100], [200, 200], [300, 200]];
 		function followPath (attackerId) {
-			
+			pathSlope = (attackerId.y - catePath[attackerId.currentSegment][1]) / (attackerId.x - catePath[attackerId.currentSegment][0])
+			diagonalLength = Math.sqrt(1 + (pathSlope ** 2));
+			oneForSlope = 1 / diagonalLength;
+			offset = [oneForSlope, oneForSlope * pathSlope];
+            attackerId.x += offset[0] * attackerId.stage.cateSpeed;
+			attackerId.y += offset[1] * attackerId.stage.cateSpeed;
+			//pathAngle = 57.2958 * Math.atan(pathSlope);
 		}	
 
 		frame = 0;
 		app.ticker.add(animate);
 		function animate() {
 			if (frame % waveType.cateSpawnRate == 0) {
-				if((frame / waveType.cateSpawnRate) % 2 == 0){
+				//if((frame / waveType.cateSpawnRate) % 2 == 0){
 				cateSpawn(0, [50, 75]);
-				}else{
+				/*}else{
 				cateSpawn(0, [50, 250]);
-				}
+				}*/
 			}
 			for (var i = 0; i < cates.length; i++) {
 				//cates[i].x += waveType.cateSpeed;
-
+				followPath(cates[i]);
 			}
 			if (frame % 30 == 0) {
 				for (var i = 0; i < doges.length; i++) {
