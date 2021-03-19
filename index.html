@@ -26,6 +26,8 @@
 		});
 
 		const thiefCate = PIXI.Texture.from('https://cdn.discordapp.com/emojis/569160672739590174.png?v=1');
+		catePath = [[100, 100], [200, 200], [300, 200], [200, 300], [300, 400]];
+		catesSpawned = 0;
 		defaultWave = {
 		cateSpeed: 1,
 		cateSpawnRate: 120
@@ -38,9 +40,11 @@
 		let cates = [];
 		function cateSpawn(type, pos) {
 			for (i = 0; i < 1; i++) {
-				let cate = new PIXI.Sprite(thiefCate); 
+				let cate = new PIXI.Sprite(thiefCate);
 				cate.anchor.set(0.5);
 				cate.currentSegment = 0;
+				cate.dirToWaypoint;
+				cate.totalId = catesSpawned;
 				//variables base on inputs
 				cate.x = pos[0];
 				cate.y = pos[1];
@@ -50,9 +54,11 @@
 				cate.width = cateTypes[type].size[0];
 				cate.height = cateTypes[type].size[1];
 				cate.stage = defaultWave;
+				cate.path = catePath;
 				//add to stage and array
 				app.stage.addChild(cate);
 				cates.push(cate);
+				catesSpawned++;
 			}
 		}
 		
@@ -78,16 +84,13 @@
 			}
 		}
 		//dogeSpawn(0, [50, 35]);
-		dogeSpawn(0, [50, 200]);
+		//dogeSpawn(0, [50, 200]);
 		dogeSpawn(0, [400, 225]);
 
-		function getDistance(p1, p2, absolute) {
+		function getDistance(p1, p2) {
 			xL = p1.x - p2.x;
 			yL = p1.y - p2.y;
 			d = Math.sqrt((xL * xL) + (yL * yL));
-			if (absolute) {
-				return (Math.abs(d));
-			}
 			return(d);
 		}
 
@@ -128,26 +131,52 @@
 			return(no_movement);
 		}
 
-		const catePath = [[100, 100], [200, 200], [300, 200]];
-		function followPath (attackerId) {
-			pathSlope = (attackerId.y - catePath[attackerId.currentSegment][1]) / (attackerId.x - catePath[attackerId.currentSegment][0])
-			diagonalLength = Math.sqrt(1 + (pathSlope ** 2));
-			oneForSlope = 1 / diagonalLength;
-			offset = [oneForSlope, oneForSlope * pathSlope];
-            attackerId.x += offset[0] * attackerId.stage.cateSpeed;
-			attackerId.y += offset[1] * attackerId.stage.cateSpeed;
-			//pathAngle = 57.2958 * Math.atan(pathSlope);
+        function followPath(attackerId) {
+            if (attackerId.currentSegment >= attackerId.path.length) {
+				attackerId.position.x += attackerId.stage.cateSpeed;
+                return
+            }
+            if (attackerId.position.x == attackerId.path[attackerId.currentSegment][0] && attackerId.position.y == attackerId.path[attackerId.currentSegment][1]) {
+				attackerId.currentSegment++;
+			}
+			if (attackerId.x == attackerId.path[attackerId.currentSegment][0]) {
+				if (attackerId.y < attackerId.path[attackerId.currentSegment][1]) {
+
+                }
+			} else {
+				startPoint = attackerId.position;
+				pathSlope = (attackerId.y - attackerId.path[attackerId.currentSegment][1]) / (attackerId.x - attackerId.path[attackerId.currentSegment][0])
+				diagonalLength = Math.sqrt(1 + (pathSlope ** 2));
+				oneForSlope = 1 / diagonalLength;
+				offset = [oneForSlope, oneForSlope * pathSlope];
+                if (attackerId.x > attackerId.path[attackerId.currentSegment][0]) {
+                    attackerId.dirToWaypoint = -1;
+				} else {
+					attackerId.dirToWaypoint = 1;
+                }
+				attackerId.x += offset[0] * attackerId.stage.cateSpeed * attackerId.dirToWaypoint;
+				attackerId.y += offset[1] * attackerId.stage.cateSpeed * attackerId.dirToWaypoint;
+				if ((attackerId.x > attackerId.path[attackerId.currentSegment][0] && attackerId.dirToWaypoint == 1) || (attackerId.x < attackerId.path[attackerId.currentSegment][0] && attackerId.dirToWaypoint == -1)) {
+					if (getDistance(attackerId.position, attackerId.path[attackerId.currentSegment]) >= attackerId.stage.cateSpeed / 2) {
+						attackerId.currentSegment++;
+						followPath(attackerId);
+					} else {
+						attackerId.currentSegment++;
+                    }
+                }
+				//pathAngle = 57.2958 * Math.atan(pathSlope);
+			}
 		}	
 
 		frame = 0;
 		app.ticker.add(animate);
 		function animate() {
 			if (frame % waveType.cateSpawnRate == 0) {
-				//if((frame / waveType.cateSpawnRate) % 2 == 0){
-				cateSpawn(0, [50, 75]);
-				/*}else{
-				cateSpawn(0, [50, 250]);
-				}*/
+				if((frame / waveType.cateSpawnRate) % 2 == 0){
+				cateSpawn(0, [100, 100]);
+				}else{
+				cateSpawn(0, [50, 100]);
+				}
 			}
 			for (var i = 0; i < cates.length; i++) {
 				//cates[i].x += waveType.cateSpeed;
