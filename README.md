@@ -1,2 +1,2 @@
 # DOGE_bloons
-a typical balloon popping game, but doge/dogelore themed. Made using PIXIJS
+a typical tower defense game, but doge/dogelore themed. Made using PIXIJS
