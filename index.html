@@ -1,6 +1,6 @@
 <doctype html>
 <head>
-    	<title>Doge castle defense</title> 
+		<title>Doge castle defense</title>
 	<style>
 		body{
 			margin: 0;
@@ -9,21 +9,42 @@
 			display: block;
 			margin-left: auto;
 			margin-right: auto;
+			touch-action: none;
+			width: 1400px;
+			height: 756px;
+			cursor: inherit;
 		}
 	</style>
 </head>
 <body>
-	<canvas id="gamePanel"></canvas>
+	<canvas id="gamePanel" width="1400" height="756"></canvas>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.1.3/pixi.min.js"></script>
 	<script type="text/javascript">
 		const canvas = document.getElementById('gamePanel');
 		const app = new PIXI.Application({
 			view: canvas,
-			width: window.innerWidth * 0.9,
-			height: window.innerHeight * 0.9,
+			width: 2800,
+			height: 1512,
 			backgroundColor: 0x7cfc00,
 			autostart: false
 		});
+	
+		const canvasSizeRatio = 2800 / 1512;
+		function resize() {
+			if (window.innerWidth / window.innerHeight >= canvasSizeRatio) {
+				var w = window.innerHeight * canvasSizeRatio * 0.9;
+				var h = window.innerHeight * 0.9;
+			} else {
+				var w = window.innerWidth * 0.9;
+				var h = window.innerWidth / canvasSizeRatio * 0.9;
+			}
+			app.renderer.view.style.width = w + 'px';
+			app.renderer.view.style.height = h + 'px';
+		}
+		window.onresize = function(event) {
+			resize();
+		};
+		resize();
 
 		const thiefCate = PIXI.Texture.from('https://cdn.discordapp.com/emojis/569160672739590174.png?v=1');
 		var catePath = [[100, 100], [200, 200], [300, 200], [200, 300], [300, 400]];
@@ -103,21 +124,48 @@
 				alert("oh noes! looks like your base was defeated by the cates!");
 			}
 		}
-
-		
+	
+		var menuOpen = false;
+		function menuOBDown() {}
+		function menuOBUp() {
+			menuOpen = !menuOpen
+			menuPage1.visible = menuOpen;
+			if (menuOpen) {
+				menuOpenButton.rotation ++;
+			}
+		}
+		function menuOBHover() {}
+		function menuOBOff() {}
 		const buttonTexture = PIXI.Texture.from("https://cicada330156.github.io/DOGE_bloons/openMenuButton.png");
 		console.log(buttonTexture);
 		let menuOpenButton = new PIXI.Sprite(buttonTexture);
-		//menuOpenButton.anchor = [1, 0];
-		menuOpenButton.scale = (0.5, 0.5);
-		menuOpenButton.x = 200;
+		menuOpenButton.interactive = true;
+		menuOpenButton.buttonMode = true;
+		menuOpenButton
+			.on('pointerdown', menuOBDown)
+			.on('pointerup', menuOBUp)
+			.on('pointerover', menuOBHover)
+			.on('pointerout', menuOBOff);
+		menuOpenButton.anchor.set(0.5, 0.5);
+		menuOpenButton.scale.x = 0.5;
+		menuOpenButton.scale.y = 0.5;
+		menuOpenButton.x = app.renderer.width;
 		menuOpenButton.y = 200;
 		console.log(menuOpenButton.position);
 		app.stage.addChild(menuOpenButton);
 		function openMenu () {
 			
 		}
-
+		let menu = new PIXI.Container();
+		app.stage.addChild(menu)
+		const menuPage1 = new PIXI.Graphics();
+		menu.addChild(menuPage1);
+		menuPage1
+		   .beginFill(0x999999)
+		   .drawRect(30, 20, 150, 150)
+		   .visible = false;
+		   
+		   
 		function checkVertical (p1, p2) {
 			if (p1 != p2) {
 				if (p1[0] != p2[0]) {
@@ -130,30 +178,30 @@
 			}
 			return(no_movement);
 		}
-
-        function followPath(attackerId) {
-            if (attackerId.currentSegment >= attackerId.path.length) {
+	
+		function followPath(attackerId) {
+			if (attackerId.currentSegment >= attackerId.path.length) {
 				attackerId.position.x += attackerId.stage.cateSpeed;
-                return
-            }
-            if (attackerId.position.x == attackerId.path[attackerId.currentSegment][0] && attackerId.position.y == attackerId.path[attackerId.currentSegment][1]) {
+				return
+			}
+			if (attackerId.position.x == attackerId.path[attackerId.currentSegment][0] && attackerId.position.y == attackerId.path[attackerId.currentSegment][1]) {
 				attackerId.currentSegment++;
 			}
 			if (attackerId.x == attackerId.path[attackerId.currentSegment][0]) {
 				if (attackerId.y < attackerId.path[attackerId.currentSegment][1]) {
 
-                }
+				}
 			} else {
 				startPoint = attackerId.position;
 				pathSlope = (attackerId.y - attackerId.path[attackerId.currentSegment][1]) / (attackerId.x - attackerId.path[attackerId.currentSegment][0])
 				diagonalLength = Math.sqrt(1 + (pathSlope ** 2));
 				oneForSlope = 1 / diagonalLength;
 				offset = [oneForSlope, oneForSlope * pathSlope];
-                if (attackerId.x > attackerId.path[attackerId.currentSegment][0]) {
-                    attackerId.dirToWaypoint = -1;
+				if (attackerId.x > attackerId.path[attackerId.currentSegment][0]) {
+					attackerId.dirToWaypoint = -1;
 				} else {
 					attackerId.dirToWaypoint = 1;
-                }
+				}
 				attackerId.x += offset[0] * attackerId.stage.cateSpeed * attackerId.dirToWaypoint;
 				attackerId.y += offset[1] * attackerId.stage.cateSpeed * attackerId.dirToWaypoint;
 				if ((attackerId.x > attackerId.path[attackerId.currentSegment][0] && attackerId.dirToWaypoint == 1) || (attackerId.x < attackerId.path[attackerId.currentSegment][0] && attackerId.dirToWaypoint == -1)) {
@@ -162,11 +210,11 @@
 						followPath(attackerId);
 					} else {
 						attackerId.currentSegment++;
-                    }
-                }
+					}
+				}
 				//pathAngle = 57.2958 * Math.atan(pathSlope);
 			}
-		}	
+		}
 
 		frame = 0;
 		app.ticker.add(animate);
