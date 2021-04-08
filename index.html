@@ -1,263 +1,289 @@
-<doctype html>
-<head>
+<!DOCTYPE html>
+<html lang="en">
+	<head>
 		<title>Doge castle defense</title>
-	<style>
-		body{
-			margin: 0;
-		}
-		canvas{
-			display: block;
-			margin-left: auto;
-			margin-right: auto;
-			touch-action: none;
-			width: 1400px;
-			height: 756px;
-			cursor: inherit;
-		}
-	</style>
-</head>
-<body>
-	<canvas id="gamePanel" width="1400" height="756"></canvas>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.1.3/pixi.min.js"></script>
-	<script type="text/javascript">
-		const canvas = document.getElementById('gamePanel');
-		const app = new PIXI.Application({
-			view: canvas,
-			width: 2800,
-			height: 1512,
-			backgroundColor: 0x7cfc00,
-			autostart: false
-		});
-	
-		const canvasSizeRatio = 2800 / 1512;
-		function resize() {
-			if (window.innerWidth / window.innerHeight >= canvasSizeRatio) {
-				var w = window.innerHeight * canvasSizeRatio * 0.9;
-				var h = window.innerHeight * 0.9;
-			} else {
-				var w = window.innerWidth * 0.9;
-				var h = window.innerWidth / canvasSizeRatio * 0.9;
+		<style>
+			body{
+				margin: 0;
 			}
-			app.renderer.view.style.width = w + 'px';
-			app.renderer.view.style.height = h + 'px';
-		}
-		window.onresize = function(event) {
-			resize();
-		};
-		resize();
-
-		const thiefCate = PIXI.Texture.from('https://cdn.discordapp.com/emojis/569160672739590174.png?v=1');
-		var catePath = [[100, 100], [200, 200], [300, 200], [200, 300], [300, 400]];
-		catesSpawned = 0;
-		defaultWave = {
-		cateSpeed: 1,
-		cateSpawnRate: 120
-		}
-		cateTypes = [
-			{size: [113, 100], attack: 5, HP: 10},//normal cate
-			{size: [113, 100]}
-		]
-		waveType = defaultWave;
-		let cates = [];
-		function cateSpawn(type, pos) {
-			for (i = 0; i < 1; i++) {
-				let cate = new PIXI.Sprite(thiefCate);
-				cate.anchor.set(0.5);
-				cate.currentSegment = 0;
-				cate.dirToWaypoint;
-				cate.totalId = catesSpawned;
-				//variables base on inputs
-				cate.x = pos[0];
-				cate.y = pos[1];
-				//type defined traits vv
-				cate.attack = cateTypes[type].attack;
-				cate.HP = cateTypes[type].HP;
-				cate.width = cateTypes[type].size[0];
-				cate.height = cateTypes[type].size[1];
-				cate.stage = defaultWave;
-				cate.path = catePath;
-				//add to stage and array
-				app.stage.addChild(cate);
-				cates.push(cate);
-				catesSpawned++;
+			canvas{
+				display: block;
+				margin-left: auto;
+				margin-right: auto;
+				touch-action: none;
+				width: 1400px;
+				height: 756px;
+				cursor: inherit;
+			}html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, a, abbr, acronym, address, big, cite, code, del, dfn, em, font, img, ins, kbd, q, s, samp, small, strike, strong, sub, sup, tt, var, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset, form, label, legend, caption {
+				margin: 0;
+				padding: 0;
+				border: 0;
+				outline: 0;
+				font-size: 100%;
+				vertical-align: baseline;
+				background: transparent;
 			}
-		}
+		</style>
+		<script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
+			crossorigin="anonymous"></script>
+		<script>
+			$(function () {
+				$("#header").load("header.html");
+				$("#footer").load("footer.html");
+			});
+		</script>
+	</head>
+	<body>
+		<div id="header"></div>
+		<canvas id="gamePanel" width="1400" height="756"></canvas>
+		<div id="startSection">
+			<p>Hey there! Press the following button to start: </p>
+			<button onclick="app.ticker.start(); document.getElementById('startSection').remove();">START</button>
+		</div>
 		
-		const closeDefDoge = PIXI.Texture.from('https://cdn.discordapp.com/emojis/688470220867764228.png?v=1');
-		dogeTypes = [
-		{range: 50, attack: 5}, //close defense baguette doge
-		{range: 200, attach: 3} //ranged attack doge
-		];
-		//dogeType = dogeCloseDef;
-		let doges = [];
-		function dogeSpawn (type, pos) {
-			for (i = 0; i < 1; i++) {
-				let doge = new PIXI.Sprite(closeDefDoge);
-				doge.range = dogeTypes[type].range;
-				doge.attack = dogeTypes[type].attack;
-				doge.anchor.set(0.5);
-				doge.height = 100;
-				doge.width = 100;
-				doge.x = pos[0];
-				doge.y = pos[1];
-				app.stage.addChild(doge);
-				doges.push(doge);
-			}
-		}
-		//dogeSpawn(0, [50, 35]);
-		//dogeSpawn(0, [50, 200]);
-		dogeSpawn(0, [400, 225]);
-
-		function getDistance(p1, p2) {
-			xL = p1.x - p2.x;
-			yL = p1.y - p2.y;
-			d = Math.sqrt((xL * xL) + (yL * yL));
-			return(d);
-		}
-
-		const defaultBaseHP = 20;
-		baseHP = defaultBaseHP;
-		function hurtBase(attacker) {
-			baseHP -= attacker.attack;
-			if (baseHP <= 0) {
-				app.ticker.stop();
-				alert("oh noes! looks like your base was defeated by the cates!");
-			}
-		}
-	
-		var menuOpen = false;
-		function menuOBDown() {}
-		function menuOBUp() {
-			menuOpen = !menuOpen
-			menuPage1.visible = menuOpen;
-			if (menuOpen) {
-				menuOpenButton.rotation ++;
-			}
-		}
-		function menuOBHover() {}
-		function menuOBOff() {}
-		const buttonTexture = PIXI.Texture.from("https://cicada330156.github.io/DOGE_bloons/openMenuButton.png");
-		console.log(buttonTexture);
-		let menuOpenButton = new PIXI.Sprite(buttonTexture);
-		menuOpenButton.interactive = true;
-		menuOpenButton.buttonMode = true;
-		menuOpenButton
-			.on('pointerdown', menuOBDown)
-			.on('pointerup', menuOBUp)
-			.on('pointerover', menuOBHover)
-			.on('pointerout', menuOBOff);
-		menuOpenButton.anchor.set(0.5, 0.5);
-		menuOpenButton.scale.x = 0.5;
-		menuOpenButton.scale.y = 0.5;
-		menuOpenButton.x = app.renderer.width;
-		menuOpenButton.y = 200;
-		console.log(menuOpenButton.position);
-		app.stage.addChild(menuOpenButton);
-		function openMenu () {
-			
-		}
-		let menu = new PIXI.Container();
-		app.stage.addChild(menu)
-		const menuPage1 = new PIXI.Graphics();
-		menu.addChild(menuPage1);
-		menuPage1
-		   .beginFill(0x999999)
-		   .drawRect(30, 20, 150, 150)
-		   .visible = false;
-		   
-		   
-		function checkVertical (p1, p2) {
-			if (p1 != p2) {
-				if (p1[0] != p2[0]) {
-					if (p1[1] != p2[1]) {
-						return(diagonal);
-					}
-					return(horizontal);
-				}
-				return(vertical);
-			}
-			return(no_movement);
-		}
-	
-		function followPath(attackerId) {
-			if (attackerId.currentSegment >= attackerId.path.length) {
-				attackerId.position.x += attackerId.stage.cateSpeed;
-				return
-			}
-			if (attackerId.position.x == attackerId.path[attackerId.currentSegment][0] && attackerId.position.y == attackerId.path[attackerId.currentSegment][1]) {
-				attackerId.currentSegment++;
-			}
-			if (attackerId.x == attackerId.path[attackerId.currentSegment][0]) {
-				if (attackerId.y < attackerId.path[attackerId.currentSegment][1]) {
-
-				}
-			} else {
-				startPoint = attackerId.position;
-				pathSlope = (attackerId.y - attackerId.path[attackerId.currentSegment][1]) / (attackerId.x - attackerId.path[attackerId.currentSegment][0])
-				diagonalLength = Math.sqrt(1 + (pathSlope ** 2));
-				oneForSlope = 1 / diagonalLength;
-				offset = [oneForSlope, oneForSlope * pathSlope];
-				if (attackerId.x > attackerId.path[attackerId.currentSegment][0]) {
-					attackerId.dirToWaypoint = -1;
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/pixi.js/5.1.3/pixi.min.js"></script>
+		<script type="text/javascript">
+			const canvas = document.getElementById('gamePanel');
+			const app = new PIXI.Application({
+				view: canvas,
+				width: 2800,
+				height: 1512,
+				backgroundColor: 0x7cfc00,
+				autostart: false
+			});
+			app.ticker.stop();
+		
+			const canvasSizeRatio = 2800 / 1512;
+			function resize() {
+				if (window.innerWidth / window.innerHeight >= canvasSizeRatio) {
+					var w = window.innerHeight * canvasSizeRatio * 0.9;
+					var h = window.innerHeight * 0.9;
 				} else {
-					attackerId.dirToWaypoint = 1;
+					var w = window.innerWidth * 0.9;
+					var h = window.innerWidth / canvasSizeRatio * 0.9;
 				}
-				attackerId.x += offset[0] * attackerId.stage.cateSpeed * attackerId.dirToWaypoint;
-				attackerId.y += offset[1] * attackerId.stage.cateSpeed * attackerId.dirToWaypoint;
-				if ((attackerId.x > attackerId.path[attackerId.currentSegment][0] && attackerId.dirToWaypoint == 1) || (attackerId.x < attackerId.path[attackerId.currentSegment][0] && attackerId.dirToWaypoint == -1)) {
-					if (getDistance(attackerId.position, attackerId.path[attackerId.currentSegment]) >= attackerId.stage.cateSpeed / 2) {
-						attackerId.currentSegment++;
-						followPath(attackerId);
+				app.renderer.view.style.width = w + 'px';
+				app.renderer.view.style.height = h + 'px';
+			}
+			window.onresize = function(event) {
+				resize();
+			};
+			resize();
+
+			const thiefCate = PIXI.Texture.from('https://cdn.discordapp.com/emojis/569160672739590174.png?v=1');
+			var catePath = [[100, 100], [200, 200], [300, 200], [200, 300], [300, 400]];
+			catesSpawned = 0;
+			defaultWave = {
+			cateSpeed: 1,
+			cateSpawnRate: 120
+			}
+			cateTypes = [
+				{size: [113, 100], attack: 5, HP: 10},//normal cate
+				{size: [113, 100]}
+			]
+			waveType = defaultWave;
+			let cates = [];
+			function cateSpawn(type, pos) {
+				for (i = 0; i < 1; i++) {
+					let cate = new PIXI.Sprite(thiefCate);
+					cate.anchor.set(0.5);
+					cate.currentSegment = 0;
+					cate.dirToWaypoint;
+					cate.totalId = catesSpawned;
+					//variables base on inputs
+					cate.x = pos[0];
+					cate.y = pos[1];
+					//type defined traits vv
+					cate.attack = cateTypes[type].attack;
+					cate.HP = cateTypes[type].HP;
+					cate.width = cateTypes[type].size[0];
+					cate.height = cateTypes[type].size[1];
+					cate.stage = defaultWave;
+					cate.path = catePath;
+					//add to stage and array
+					app.stage.addChild(cate);
+					cates.push(cate);
+					catesSpawned++;
+				}
+			}
+			
+			const closeDefDoge = PIXI.Texture.from('https://cdn.discordapp.com/emojis/688470220867764228.png?v=1');
+			dogeTypes = [
+			{range: 50, attack: 5}, //close defense baguette doge
+			{range: 200, attach: 3} //ranged attack doge
+			];
+			//dogeType = dogeCloseDef;
+			let doges = [];
+			function dogeSpawn (type, pos) {
+				for (i = 0; i < 1; i++) {
+					let doge = new PIXI.Sprite(closeDefDoge);
+					doge.range = dogeTypes[type].range;
+					doge.attack = dogeTypes[type].attack;
+					doge.anchor.set(0.5);
+					doge.height = 100;
+					doge.width = 100;
+					doge.x = pos[0];
+					doge.y = pos[1];
+					app.stage.addChild(doge);
+					doges.push(doge);
+				}
+			}
+			//dogeSpawn(0, [50, 35]);
+			//dogeSpawn(0, [50, 200]);
+			dogeSpawn(0, [400, 225]);
+
+			function getDistance(p1, p2) {
+				xL = p1.x - p2.x;
+				yL = p1.y - p2.y;
+				d = Math.sqrt((xL * xL) + (yL * yL));
+				return(d);
+			}
+
+			const defaultBaseHP = 20;
+			baseHP = defaultBaseHP;
+			function hurtBase(attacker) {
+				baseHP -= attacker.attack;
+				if (baseHP <= 0) {
+					app.ticker.stop();
+					alert("oh noes! looks like your base was defeated by the cates!");
+					document.body.innerHTML += "<p>RIP. Looks like your base was defeated.</p>"
+				}
+			}
+		
+			var menuOpen = false;
+			function menuOBDown() {}
+			function menuOBUp() {
+				menuOpen = !menuOpen
+				menuPage1.visible = menuOpen;
+				if (menuOpen) {
+					menuOpenButton.rotation ++;
+				}
+			}
+			function menuOBHover() {}
+			function menuOBOff() {}
+			const buttonTexture = PIXI.Texture.from("https://cicada330156.github.io/DOGE_bloons/openMenuButton.png");
+			console.log(buttonTexture);
+			let menuOpenButton = new PIXI.Sprite(buttonTexture);
+			menuOpenButton.interactive = true;
+			menuOpenButton.buttonMode = true;
+			menuOpenButton
+				.on('pointerdown', menuOBDown)
+				.on('pointerup', menuOBUp)
+				.on('pointerover', menuOBHover)
+				.on('pointerout', menuOBOff);
+			menuOpenButton.anchor.set(0.5, 0.5);
+			menuOpenButton.scale.x = 0.5;
+			menuOpenButton.scale.y = 0.5;
+			menuOpenButton.x = app.renderer.width;
+			menuOpenButton.y = 200;
+			console.log(menuOpenButton.position);
+			app.stage.addChild(menuOpenButton);
+			function openMenu () {
+				
+			}
+			let menu = new PIXI.Container();
+			app.stage.addChild(menu)
+			const menuPage1 = new PIXI.Graphics();
+			menu.addChild(menuPage1);
+			menuPage1
+			.beginFill(0x999999)
+			.drawRect(30, 20, 150, 150)
+			.visible = false;
+			
+			
+			function checkVertical (p1, p2) {
+				if (p1 != p2) {
+					if (p1[0] != p2[0]) {
+						if (p1[1] != p2[1]) {
+							return(diagonal);
+						}
+						return(horizontal);
+					}
+					return(vertical);
+				}
+				return(no_movement);
+			}
+		
+			function followPath(attackerId) {
+				if (attackerId.currentSegment >= attackerId.path.length) {
+					attackerId.position.x += attackerId.stage.cateSpeed;
+					return
+				}
+				if (attackerId.position.x == attackerId.path[attackerId.currentSegment][0] && attackerId.position.y == attackerId.path[attackerId.currentSegment][1]) {
+					attackerId.currentSegment++;
+				}
+				if (attackerId.x == attackerId.path[attackerId.currentSegment][0]) {
+					if (attackerId.y < attackerId.path[attackerId.currentSegment][1]) {
+
+					}
+				} else {
+					startPoint = attackerId.position;
+					pathSlope = (attackerId.y - attackerId.path[attackerId.currentSegment][1]) / (attackerId.x - attackerId.path[attackerId.currentSegment][0])
+					diagonalLength = Math.sqrt(1 + (pathSlope ** 2));
+					oneForSlope = 1 / diagonalLength;
+					offset = [oneForSlope, oneForSlope * pathSlope];
+					if (attackerId.x > attackerId.path[attackerId.currentSegment][0]) {
+						attackerId.dirToWaypoint = -1;
 					} else {
-						attackerId.currentSegment++;
+						attackerId.dirToWaypoint = 1;
 					}
-				}
-				//pathAngle = 57.2958 * Math.atan(pathSlope);
-			}
-		}
-
-		frame = 0;
-		app.ticker.add(animate);
-		function animate() {
-			if (frame % waveType.cateSpawnRate == 0) {
-				if((frame / waveType.cateSpawnRate) % 2 == 0){
-				cateSpawn(0, [100, 100]);
-				}else{
-				cateSpawn(0, [50, 100]);
-				}
-			}
-			for (var i = 0; i < cates.length; i++) {
-				//cates[i].x += waveType.cateSpeed;
-				followPath(cates[i]);
-			}
-			if (frame % 30 == 0) {
-				for (var i = 0; i < doges.length; i++) {
-					for (var g = 0; g < cates.length; g++) {
-						spriteDistance = getDistance(cates[g].position, doges[i].position)
-						if (spriteDistance <= doges[i].range) {
-							console.log("bonk!");
-							cates[g].HP -= doges[i].attack;
-						}
-						if (cates[g].HP <= 0) {
-							app.stage.removeChild(cates[g]);
-							cates.splice(g, 1);
+					attackerId.x += offset[0] * attackerId.stage.cateSpeed * attackerId.dirToWaypoint;
+					attackerId.y += offset[1] * attackerId.stage.cateSpeed * attackerId.dirToWaypoint;
+					if ((attackerId.x > attackerId.path[attackerId.currentSegment][0] && attackerId.dirToWaypoint == 1) || (attackerId.x < attackerId.path[attackerId.currentSegment][0] && attackerId.dirToWaypoint == -1)) {
+						if (getDistance(attackerId.position, attackerId.path[attackerId.currentSegment]) >= attackerId.stage.cateSpeed / 2) {
+							attackerId.currentSegment++;
+							followPath(attackerId);
+						} else {
+							attackerId.currentSegment++;
 						}
 					}
+					//pathAngle = 57.2958 * Math.atan(pathSlope);
 				}
 			}
 
-			//everything after this has to be done last, for order of operations and such. otherwise it gets super buggy.
-			for (var i = 0; i < cates.length - 1; i++) {
-				if (cates[i].x >= app.renderer.width) {
-					hurtBase(cates[i]);
-					console.log("a cate got in! \nbase HP is now " + baseHP)
-					app.stage.removeChild(cates[i]);
-					cates.splice(i, 1);
-					i--;
+			frame = 0;
+			app.ticker.add(animate);
+			function animate() {
+				if (frame % waveType.cateSpawnRate == 0) {
+					if((frame / waveType.cateSpawnRate) % 2 == 0){
+					cateSpawn(0, [100, 100]);
+					}else{
+					cateSpawn(0, [50, 100]);
+					}
 				}
+				for (var i = 0; i < cates.length; i++) {
+					//cates[i].x += waveType.cateSpeed;
+					followPath(cates[i]);
+				}
+				if (frame % 30 == 0) {
+					for (var i = 0; i < doges.length; i++) {
+						for (var g = 0; g < cates.length; g++) {
+							spriteDistance = getDistance(cates[g].position, doges[i].position)
+							if (spriteDistance <= doges[i].range) {
+								console.log("bonk!");
+								cates[g].HP -= doges[i].attack;
+							}
+							if (cates[g].HP <= 0) {
+								app.stage.removeChild(cates[g]);
+								cates.splice(g, 1);
+							}
+						}
+					}
+				}
+
+				//everything after this has to be done last, for order of operations and such. otherwise it gets super buggy.
+				for (var i = 0; i < cates.length - 1; i++) {
+					if (cates[i].x >= app.renderer.width) {
+						hurtBase(cates[i]);
+						console.log("a cate got in! \nbase HP is now " + baseHP)
+						app.stage.removeChild(cates[i]);
+						cates.splice(i, 1);
+						i--;
+					}
+				}
+				frame++;
 			}
-			frame++;
-		}
-		app.ticker.start();
-	</script>
-</body>
+			//app.ticker.start();
+		</script>
+	</body>
+</html>
