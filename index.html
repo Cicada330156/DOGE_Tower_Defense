@@ -26,9 +26,9 @@
 		</style>
 		<script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="
 			crossorigin="anonymous"></script>
-		<script src="Attack_animations.js"></script>
-		<script src="Movement.js"></script>
-		<script src="Shop.js"></script>
+		<script src="Scripts/Attack_animations.js"></script>
+		<script src="Scripts/Movement.js"></script>
+		<script src="Scripts/Shop.js"></script>
 		<script>
 			$(function () {
 				$("#header").load("header.html");
@@ -153,45 +153,6 @@
 				}
 			}
 		
-			var menuOpen = false;
-			function menuOBDown() {}
-			function menuOBUp() {
-				menuOpen = !menuOpen
-				menuPage1.visible = menuOpen;
-				if (menuOpen) {
-					menuOpenButton.rotation ++;
-				}
-			}
-			function menuOBHover() {}
-			function menuOBOff() {}
-			const buttonTexture = PIXI.Texture.from("https://cicada330156.github.io/DOGE_bloons/openMenuButton.png");
-			console.log(buttonTexture);
-			let menuOpenButton = new PIXI.Sprite(buttonTexture);
-			menuOpenButton.interactive = true;
-			menuOpenButton.buttonMode = true;
-			menuOpenButton
-				.on('pointerdown', menuOBDown)
-				.on('pointerup', menuOBUp)
-				.on('pointerover', menuOBHover)
-				.on('pointerout', menuOBOff);
-			menuOpenButton.anchor.set(0.5, 0.5);
-			menuOpenButton.scale.x = 0.5;
-			menuOpenButton.scale.y = 0.5;
-			menuOpenButton.x = app.renderer.width;
-			menuOpenButton.y = 200;
-			console.log(menuOpenButton.position);
-			app.stage.addChild(menuOpenButton);
-			function openMenu () {
-				
-			}
-			let menu = new PIXI.Container();
-			app.stage.addChild(menu)
-			const menuPage1 = new PIXI.Graphics();
-			menu.addChild(menuPage1);
-			menuPage1
-			.beginFill(0x999999)
-			.drawRect(30, 20, 150, 150)
-			.visible = false;
 			
 			
 			function checkVertical (p1, p2) {
@@ -207,42 +168,8 @@
 				return(no_movement);
 			}
 		
-			function followPath(attackerId) {
-				if (attackerId.currentSegment >= attackerId.path.length) {
-					attackerId.position.x += attackerId.stage.cateSpeed;
-					return
-				}
-				if (attackerId.position.x == attackerId.path[attackerId.currentSegment][0] && attackerId.position.y == attackerId.path[attackerId.currentSegment][1]) {
-					attackerId.currentSegment++;
-				}
-				if (attackerId.x == attackerId.path[attackerId.currentSegment][0]) {
-					if (attackerId.y < attackerId.path[attackerId.currentSegment][1]) {
-
-					}
-				} else {
-					startPoint = attackerId.position;
-					pathSlope = (attackerId.y - attackerId.path[attackerId.currentSegment][1]) / (attackerId.x - attackerId.path[attackerId.currentSegment][0])
-					diagonalLength = Math.sqrt(1 + (pathSlope ** 2));
-					oneForSlope = 1 / diagonalLength;
-					offset = [oneForSlope, oneForSlope * pathSlope];
-					if (attackerId.x > attackerId.path[attackerId.currentSegment][0]) {
-						attackerId.dirToWaypoint = -1;
-					} else {
-						attackerId.dirToWaypoint = 1;
-					}
-					attackerId.x += offset[0] * attackerId.stage.cateSpeed * attackerId.dirToWaypoint;
-					attackerId.y += offset[1] * attackerId.stage.cateSpeed * attackerId.dirToWaypoint;
-					if ((attackerId.x > attackerId.path[attackerId.currentSegment][0] && attackerId.dirToWaypoint == 1) || (attackerId.x < attackerId.path[attackerId.currentSegment][0] && attackerId.dirToWaypoint == -1)) {
-						if (getDistance(attackerId.position, attackerId.path[attackerId.currentSegment]) >= attackerId.stage.cateSpeed / 2) {
-							attackerId.currentSegment++;
-							followPath(attackerId);
-						} else {
-							attackerId.currentSegment++;
-						}
-					}
-					//pathAngle = 57.2958 * Math.atan(pathSlope);
-				}
-			}
+			
+			
 
 			frame = 0;
 			app.ticker.add(animate);
