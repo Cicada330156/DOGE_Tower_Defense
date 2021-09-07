@@ -56,12 +56,17 @@
 		
 			const canvasSizeRatio = 2800 / 1500;
 			function resize() {
-				if (window.innerWidth / window.innerHeight >= canvasSizeRatio) {
-					var w = window.innerHeight * canvasSizeRatio * 0.9;
-					var h = window.innerHeight * 0.9;
+				if (window.innerHeight * 0.9 >= 750 && window.innerWidth * 0.9 >= 1400) {
+					var w = 1400;
+					var h = 750;
 				} else {
-					var w = window.innerWidth * 0.9;
-					var h = window.innerWidth / canvasSizeRatio * 0.9;
+					if (window.innerWidth / window.innerHeight >= canvasSizeRatio) {
+						var w = window.innerHeight * canvasSizeRatio * 0.9;
+						var h = window.innerHeight * 0.9;
+					} else {
+						var w = window.innerWidth * 0.9;
+						var h = window.innerWidth / canvasSizeRatio * 0.9;
+					}
 				}
 				app.renderer.view.style.width = w + 'px';
 				app.renderer.view.style.height = h + 'px';
