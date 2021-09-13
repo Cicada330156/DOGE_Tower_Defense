@@ -1,21 +1,49 @@
 var menuOpen = false;
 menuTop = 150;
-menuHeight = 1000;
-menuWidth = 500;
+menuHeight = 1200;
+menuWidth = 600;
 
 let menu = new PIXI.Container();
 app.stage.addChild(menu)
+menu.x = app.renderer.width - menuWidth;
+menu.y = menuTop;
 const menuBG = new PIXI.Graphics();
-app.stage.addChild(menuBG);
 menuBG
 	.beginFill(0x999999)
-	.drawRect(app.renderer.width - menuWidth, menuTop, menuWidth, menuHeight)
-	.visible = false;
+	.drawRect(0, 0, menuWidth, menuHeight)
+menu.addChild(menuBG);
 
-const menuPage1 = new PIXI.Container();
-menu.addChild(menuPage1);
+//const menuPage1 = new PIXI.Container();
+//menu.addChild(menuPage1);
+currentShopIndex = 0;
+console.log(menuBG);
 
+class dogeShopPage {
+	constructor (definedDoge) {
+		this.type = definedDoge.name;
+		this.price = definedDoge.price;
+		this.texture = definedDoge.dogeTexture;
+		this.count = 0;
+	}
+}
 shopItems = []; //will create procedurally based on dogeTypes array
+dogeTypes.forEach(element => {
+	newDoge = new dogeShopPage(element);
+	shopItems.push(newDoge);
+});
+
+shopTitle = new PIXI.Text('SHOP', {fontSize: 100, fill : 0xff1010});
+menu.addChild(shopTitle);
+shopTitle.x = 213;
+shopTitle.y = 0;
+
+defenderName = new PIXI.Text(shopItems[0].type, {fontSize: 50, fill: 0xff1010, wordWrap: true, wordWrapWidth: menu.width});
+menu.addChild(defenderName);
+defenderName.x = 15;
+defenderName.y = 105;
+function setPage (page) {
+	
+}
 
 console.log("page loaded");
 const dropdownButtonTexture = PIXI.Texture.from("https://cicada330156.github.io/DOGE_bloons/Assets/openMenuButton.png");
@@ -27,11 +55,13 @@ menuOpenButton.scale.y = 0.35;
 setTimeout ( function(){
 	menuOpenButton.x = app.renderer.width - menuOpenButton.height;
 	menuOpenButton.y = menuTop + menuOpenButton.width;
-	console.log(menuOpenButton.position);
 }, 500);
 menuOpenButton.rotation = Math.PI * 1.5;
 app.stage.addChild(menuOpenButton);
 
+
+
+menu.visible = false;
 menuOpenButton
 	.on('pointerdown', menuOBDown)
 	.on('pointerup', menuOBUp)
@@ -40,7 +70,7 @@ menuOpenButton
 function menuOBDown() {}
 function menuOBUp() {
 	menuOpen = !menuOpen
-	menuBG.visible = menuOpen;
+	menu.visible = menuOpen;
 	if (menuOpen) {
 		menuOpenButton.rotation = 0;
 		menuOpenButton.x = app.renderer.width - menuWidth;

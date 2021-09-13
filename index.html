@@ -98,14 +98,14 @@
 			}
 
 			const thiefCate = PIXI.Texture.from('https://cdn.discordapp.com/emojis/569160672739590174.png?v=1');
-			var catePath = [[100, 100], [200, 200], [300, 200], [200, 300], [300, 400]];
+			var catePath = [[100, 100], [200, 200], [300, 200], [200, 300], [300, 500]];
 			catesSpawned = 0;
 			defaultWave = {
 			cateSpeed: 1,
 			cateSpawnRate: 120
 			}
 			cateTypes = [
-				{size: [113, 100], attack: 5, HP: 10},//normal cate
+				{size: [153, 135], attack: 5, HP: 10},//normal cate
 				{size: [113, 100]}
 			]
 			waveType = defaultWave;
@@ -136,8 +136,8 @@
 			
 			const closeDefDoge = PIXI.Texture.from('https://cdn.discordapp.com/emojis/688470220867764228.png?v=1');
 			dogeTypes = [
-			{name: "close defense baguette doge", price: 30, dogeTexture: closeDefDoge, range: 50, attack: 5}, //close defense baguette doge
-			{range: 200, attach: 3} //ranged attack doge
+			{name: "close defense baguette doge", size: [150, 150], price: 30, dogeTexture: closeDefDoge, range: 50, attack: 5}, //close defense baguette doge
+			{name: "ranged doge", price: 50, dogeTexture: closeDefDoge, range: 200, attack: 3} //ranged attack doge
 			];
 			//dogeType = dogeCloseDef;
 			let doges = [];
@@ -147,8 +147,8 @@
 					doge.range = dogeTypes[type].range;
 					doge.attack = dogeTypes[type].attack;
 					doge.anchor.set(0.5);
-					doge.height = 100;
-					doge.width = 100;
+					doge.height = dogeTypes[type].size[0];
+					doge.width = dogeTypes[type].size[1];
 					doge.x = pos[0];
 					doge.y = pos[1];
 					app.stage.addChild(doge);
@@ -214,7 +214,7 @@
 					for (var i = 0; i < doges.length; i++) {
 						for (var g = 0; g < cates.length; g++) {
 							spriteDistance = getDistance(cates[g].position, doges[i].position)
-							if (spriteDistance <= doges[i].range) {
+							if (spriteDistance <= doges[i].range) {//should update to include physical size of doges
 								console.log("bonk!");
 								cates[g].HP -= doges[i].attack;
 							}
