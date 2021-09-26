@@ -12,5 +12,6 @@ Doge_tower_defense.xcodeproj/project.xcworkspace/contents.xcworkspacedata
 Doge_tower_defense.xcodeproj/project.pbxproj
 .vscode/settings.json
 helpers_normal_plus_2x_trytrytryagain.zip
-helpers_normal_plus_2x_trytrytryagain/*
+helpers_normal_plus_2x_trytrytryagain/Helpers/*
+helpers_normal_plus_2x_trytrytryagain/Helpers_2x/*
 !helpers_normal_plus_2x_trytrytryagain/Helpers_2x/airship-idle-0_2x-art-scale-2_00x
