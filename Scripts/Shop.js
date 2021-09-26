@@ -41,6 +41,11 @@ defenderName = new PIXI.Text(shopItems[0].type, {fontSize: 50, fill: 0xff1010, w
 menu.addChild(defenderName);
 defenderName.x = 15;
 defenderName.y = 105;
+
+defenderPicture = new PIXI.Sprite(shopItems[0].texture);
+menu.addChild(defenderPicture);
+defenderPicture.y = 200;
+defenderPicture.setTransform(this.x, 200, 5, 5);//x, y, scaleX, scaleY, rotation, skewX, skewY, pivotX, pivotY
 function setPage (page) {
 	
 }
