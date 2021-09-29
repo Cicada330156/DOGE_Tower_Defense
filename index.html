@@ -134,16 +134,18 @@
 				}
 			}
 			
-			const closeDefDoge = PIXI.Texture.from('https://cdn.discordapp.com/emojis/688470220867764228.png?v=1');
+			const closeDefDoge = PIXI.Texture.from('Assets/Helpers/Helpers_2x/shibes-idle-0_2x-art-scale-2_00x.png');
+			const closeDefDogeAttack = PIXI.Texture.from('Assets/Helpers/Helpers_2x/shibes-mine-0_2x-art-scale-2_00x.png');
+			closeDefDogeWHRatio = closeDefDoge.height/closeDefDoge.width;
 			dogeTypes = [
-			{name: "close defense baguette doge", size: [150, 150], price: 30, dogeTexture: closeDefDoge, range: 50, attack: 5}, //close defense baguette doge
-			{name: "ranged doge", price: 50, dogeTexture: closeDefDoge, range: 200, attack: 3} //ranged attack doge
+				{name: "close defense baguette doge", size: [150, 150 * closeDefDogeWHRatio], price: 30, dogeTextures: {idle: closeDefDoge, attack: closeDefDogeAttack}, range: 50, attack: 5}, //close defense baguette doge
+			{name: "ranged doge", price: 50, dogeTextures: {idle: closeDefDoge, attack: closeDefDogeAttack}, range: 200, attack: 3} //ranged attack doge
 			];
 			//dogeType = dogeCloseDef;
 			let doges = [];
 			function dogeSpawn (type, pos) {
 				for (i = 0; i < 1; i++) {
-					let doge = new PIXI.Sprite(dogeTypes[type].dogeTexture);
+					let doge = new PIXI.Sprite(dogeTypes[type].dogeTextures.idle);
 					doge.range = dogeTypes[type].range;
 					doge.attack = dogeTypes[type].attack;
 					doge.anchor.set(0.5);
@@ -151,6 +153,8 @@
 					doge.width = dogeTypes[type].size[1];
 					doge.x = pos[0];
 					doge.y = pos[1];
+					doge.isAttacking = false;
+					doge.textures = dogeTypes[type].dogeTextures;
 					app.stage.addChild(doge);
 					doges.push(doge);
 				}
@@ -217,6 +221,7 @@
 							if (spriteDistance <= doges[i].range) {//should update to include physical size of doges
 								console.log("bonk!");
 								cates[g].HP -= doges[i].attack;
+								attackAnimation(doges[i]);
 							}
 							if (cates[g].HP <= 0) {
 								app.stage.removeChild(cates[g]);
