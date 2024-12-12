@@ -1,0 +1,15 @@
+Character
+V
+Dog, cat
+V
+Specific_character implements gunner, missiler, mine layer
+Projectile
+V
+Bullet, missile, etc.
+
+Character.follow (path p)
+
+Abstract class pathFollower:
+Path p, int segment, double distanceAlongSegment
+Path private class Segment: level - ie overpasses length //will work with other classes?
+other info - ie foggy?
